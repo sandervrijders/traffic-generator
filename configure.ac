@@ -4,13 +4,9 @@
 # Written by: Francesco Salvestrini <f DOT salvestrini AT nextworks DOT it>
 #
 
-AC_INIT([RINA raffig Generator],
-        m4_esyscmd([build-aux/git-version-gen .tarball-version]),
-        [f.salvestrini@nextworks.it],
-        [rina-tgen],
-        [http://irati.eu])
+AC_INIT([RINA Traffic Generator],[m4_esyscmd(build-aux/git-version-gen .tarball-version)],[dimitri.staessens@intec.ugent.be],[rina-tgen],[http://github.com/irati/traffic-generator])
 
-AC_PREREQ([2.68])
+AC_PREREQ([2.69])
 
 AC_CONFIG_HEADERS([src/config.h])
 AC_CONFIG_SRCDIR([src/main.cc])
@@ -97,6 +93,12 @@ AS_IF([test "$want_debug" = "yes"],[
     ])
 ])
 
+AX_BOOST_BASE([1.55],,[
+    AC_MSG_ERROR([Your system lacks of boost support])
+])
+AX_BOOST_THREAD
+AX_BOOST_SYSTEM
+
 AC_SUBST(CPPFLAGS_EXTRA, $CPPFLAGS_EXTRA)
 AC_SUBST(CXXFLAGS_EXTRA, $CXXFLAGS_EXTRA)
 
@@ -105,6 +107,19 @@ PKG_PROG_PKG_CONFIG([0.26])
 PKG_CHECK_MODULES([LIBRINA], [librina >= 0.2.0],, [
     AC_MSG_ERROR([Your system lacks of librina support])
 ])
+
+DX_DOXYGEN_FEATURE(ON)
+DX_DOT_FEATURE(ON)
+DX_HTML_FEATURE(ON)
+DX_CHM_FEATURE(OFF)
+DX_CHI_FEATURE(OFF)
+DX_MAN_FEATURE(ON)
+DX_RTF_FEATURE(OFF)
+DX_XML_FEATURE(OFF)
+DX_PDF_FEATURE(ON)
+DX_PS_FEATURE(OFF)
+DX_INIT_DOXYGEN($PACKAGE_NAME,[doxygen.cfg],[doxygen])
+
 # FIXME: A cleaner solution would be better
 AC_SUBST([LIBRINA_VERSION],`pkg-config --modversion librina`)
 
@@ -113,6 +128,8 @@ AC_CONFIG_FILES([
 
     src/Makefile
     src/tclap/Makefile
+
+    doc/Makefile
 ])
 
 AC_OUTPUT
